@@ -109,10 +109,13 @@ Maka file akan di overwritten dengan string baru
 miral@dumbways:~$ ls -la
 ```
 ini seperti list tapi akan menampikan secara detail semua file dan directory termasuk yang hidden dengan penjelasan permission untuk file/directory tersebut
+
 ![Result Command ls -la](task-3.png)
 
 Selain itu juga ada command ```bash chmod``` yang mungkin lebih enak dijelaskan dengan screenshot
+
 ![Result Command chmod](task-3-1.png)
+
 Jadi chmod bisa merubah permission suatu file/directory dimana dengan 777 file itu bisa di lihat (r) di edit/tulis (w) dan execute (x) oleh user, group, dan publik
 
 ```bash
