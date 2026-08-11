@@ -136,7 +136,14 @@ miral@dumbways:~$ nano file-1
 ![Image nano](nano-1.png)
 ![Image nano](nano-2.png)
 
-Nano adalah command untum membuka fitur writenya linux dimana disitu ada UI nya sendiri dan digunakan untuk mengedit isi file
+Nano adalah command untuk membuka fitur writenya linux dimana disitu ada UI nya sendiri dan digunakan untuk mengedit isi file
 
+## Bonus Challenge: Ubah IP
+
+![Image challenge](challenge-1.png)
+![Image challenge](challenge-2.png)
+![Image challenge](challenge-3.png)
+
+Saya mengikuti artikel [ini](https://medium.com/@ferryanandafebian/cara-konfigurasi-ip-static-di-ubuntu-86aca0b4d360)
 
 
