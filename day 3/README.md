@@ -26,7 +26,7 @@ Dan tentu setelah itu ada cara lebih cepat juga dengan menambah config di .ssh w
 
 ![SSH Config](ssh-config.png)
 
-Dimana setelah itu bisa login sepert ini 
+Dimana setelah itu bisa login seperti ini 
 
 ![Login SSH](login-ssh3.png)
 
@@ -34,11 +34,11 @@ Dimana setelah itu bisa login sepert ini
 
 Oke ini di akses di /etc/ssh di file sshd_config
 
-![SSH Config](sshd-config1.png)
+![SSH Config](sshd_config1.png)
 
 Filenya ini sudah saya edit jadi saya kasih liat yang saya ubah
 
-![SSH Config](sshd-config2.png)
+![SSH Config](sshd_config2.png)
 
 Jadi yang di barisnya ada tanda ```#``` itu berarti komen, dan saya unkomen PubkeyAuthentication dan PasswordAuthentication
 untuk PasswordAuthentication saya ubah dari 'yes' menjadi 'no
@@ -92,6 +92,7 @@ Tetapi tidak hanya itu, misal kita menulis command seperti ini
 miral@dumbways:~$ cat > file-2
 ```
 ![Contoh cat](cat-file.png)
+
 Kalau seperti command diatas makan cat akan membuat file baru/overwrite existing file dimana baris selanjutnya itu adalah isi file tersebut kita bisa isi langsung setelah command diatas
 
 Selain itu bisa juga di buat seperti ini
@@ -99,6 +100,7 @@ Selain itu bisa juga di buat seperti ini
 miral@dumbways:~$ cat file-1 file-2 > file-3
 ```
 ![Contoh cat](cat-file2.png)
+
 Jika kita memberi nama file sebelum tanda (>) maka file selanjutnya akan dibuat/overwritten menjadi file sebelumnya, dan di contoh diatas juga memperlihatkan kalau ini bisa lebih dari 1 file
 
 ### sed
@@ -107,9 +109,11 @@ sed kurang lebih salah satu fungsinya yang diajarkan untuk me-replace string ter
 miral@dumbways:~$ sed -i 's/Hello/Hai/g' file-1
 ```
 -i itu adalah in-place untuk edit files in place, bisa di lihat full di sed -help
+
 ![List sed](sed-help.png)
 
 Contoh penggunaan commandnya seperti ini:
+
 ![Contoh sed](sed-example.png)
 
 Commandnya juga case sensitive jadi harus sesuai dengan kata yang mau di ganti
@@ -125,9 +129,11 @@ miral@dumbways:~$ grep -c Hello file-1
 ```
 
 Di bawah ini adalah contoh output dari command diatas:
+
 ![Contoh grep](grep-file.png)
 
 Berikut contoh dengan semua file:
+
 ![Contoh grep](grep-file2.png)
 
 Commandnya juga case sensitive jadi harus sesuai dengan kata yang mau di ganti
