@@ -4,7 +4,7 @@ Disini saya mengerjakan task Bootcamp DevOps Day 4
 
 ## Task 1: Penjelasan Git
 
-Git itu adalah sebuah Version Control System yang dibuat oleh Linus Torvalds. Yang dimaksud Version Control System itu adalah sistem untuk melacak perubahan-perubahan di koding dari history perubahan kode sampai kontrol kodingan dari multiple programmer. Dengan sistem ini developers bisa dengan gampang mencari tau perubahan terjadi dari mana oleh siapa dan dengan udah bekerja sama dengan developers lainnya.
+Git itu adalah sebuah Version Control System yang dibuat oleh Linus Torvalds. Yang dimaksud Version Control System itu adalah sistem untuk melacak perubahan-perubahan di koding dari history perubahan kode sampai kontrol kodingan dari multiple programmer. Dengan sistem ini developers bisa dengan gampang mencari tau perubahan terjadi dari mana oleh siapa dan dengan mudah bekerja sama dengan developers lainnya.
 
 ## Task 2: Buat sebuah repositori
 
