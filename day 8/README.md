@@ -1,6 +1,6 @@
-# Task Day 7 / Week 3
+# Task Day 8 / Week 4 / Week 2 Stage 2
 
-Disini saya mengerjakan task Bootcamp DevOps Day 8 atau Week 4 atau Week 2 Stage, Penamaan biar sama saya buat foldernya day 8.
+Disini saya mengerjakan task Bootcamp DevOps Day 8 atau Week 4 atau Week 2 Stage 2, Penamaan biar sama saya buat foldernya day 8.
 Tasknya sendiri dikerjakan selama 1 minggu ini di week 4 bootcamp.
 
 Buat pengerjaan saya akan buat dari cara pengerjaan saya baru saya pinpoint dari mana di task yang sudah saya kerjakan
