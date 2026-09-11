@@ -13,4 +13,6 @@ Dumbways DevOps Bootcamp Task
 
 [Link Day 6](day%206)
 
-[Link Day 7](day%207)
+[Link Day 7 / Week 3 / Week 1 Stage 2](day%207)
+
+[Link Day 8 / Week 4 / Week 2 Stage 2](day%208)
