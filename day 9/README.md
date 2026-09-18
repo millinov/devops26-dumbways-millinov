@@ -29,12 +29,15 @@ Note: .tfvars termasuk ke dalam .gitignore jadi tidak ada di git
 [Link Ansible yang saya buat](https://github.com/millinov/Automation/tree/main/ansible)
 
 Ansible Inventory:
+
 ![Ansible Inventory](image/ansible-inventory.png)
 
 Ansible Config:
+
 ![Ansible Config](image/ansible-config.png)
 
 Ansible Variables:
+
 ![Ansible Variables](image/ansible-vars.png)
 
 Saya membuat ansible untuk:
@@ -70,9 +73,11 @@ Seperti yang di jelaskan di atas, saya menggunakan Grafana yang akan melihat dat
 [Link Prometheus](https://prom-millinov.studentdumbways.my.id/)
 
 Grafana:
+
 ![Grafana Dashboard](image/monitor-grafana.png)
 
-Prometheus
+Prometheus:
+
 ![Prometheus Target Health](image/monitor-prom.png)
 
 Seperti yang di lihat di gambar Grafana saya sudah membuat dashboard buat Wayshub
