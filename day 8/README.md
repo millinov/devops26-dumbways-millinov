@@ -7,18 +7,18 @@ Buat pengerjaan saya akan buat dari cara pengerjaan saya baru saya pinpoint dari
 
 ## Setup server
 
-![VM Instances](vm-instance.png)
+![VM Instances](image/vm-instance.png)
 
 Masih sama, ada tambah build server dan jenkins server 
 Jenkins server untuk website jenkins nanti
 Build server untuk menge-build image docker dan juga dipakai untuk testing
 
-![Setup docker di web server](docker-webserver.png)
+![Setup docker di web server](image/docker-webserver.png)
 
 Ini docker compose yang saya buat untuk web-server
 ada nginx buat reverse proxy dan certbot untul ssl
 
-![SSL Wildcard](ssl-wildcard.png)
+![SSL Wildcard](image/ssl-wildcard.png)
 
 Masing server sudah aku buat confignya kurang lebih sama seperti di atas, menggunakan ssl_certificate yang sama
 
@@ -27,18 +27,18 @@ Saya menggunakan repository wayshub buat pengerjaan tugas kali ini
 
 ## Docker
 
-![Docker Images](docker-images.png)
+![Docker Images](image/docker-images.png)
 
 Saya juga sudah build docker image dan aku push ke akun aku
 Image di build menggunakan Dockerfile
 
-![Dockerfile frontend](dockerfiles-frontend.png)
+![Dockerfile frontend](image/dockerfiles-frontend.png)
 
-![Dockerfile backend](dockerfiles-backend.png)
+![Dockerfile backend](image/dockerfiles-backend.png)
 
 Selain itu juga aku menggunakan node:14-alpine karena lebih ringan imagenya nanti
 
-![Docker image size](docker-size.png)
+![Docker image size](image/docker-size.png)
 
 Sebelumnya jika hanya node:14 sizenya bisa 3-4x lipat dan disk sizenya hampir mencapai 2GB
 
@@ -50,13 +50,13 @@ Saya sudah build jenkins di docker dan sudah berjalan dan bisa di akses dibawah
 
 Link diatas sudah di reverse proxy juga menggunakan ketentuan Jenkins seperti di bawah
 
-![Reverse Proxy Jenkins](jenkins-revproxy.png)
+![Reverse Proxy Jenkins](image/jenkins-revproxy.png)
 
 Untuk tugas jenkins saya buat untuk CI/CD wayshub-frontend, sebelumnya juga repositorynya sudah saya copy untuk repository saya sendiri
 
 ### Setup credentials di Jenkins
 
-![Credentials di Jenkins saya](jenkins-cred.png)
+![Credentials di Jenkins saya](image/jenkins-cred.png)
 
 Saya ada 4 credentials 
 
@@ -67,7 +67,7 @@ Saya ada 4 credentials
 
 ### Jenkinsfile untuk job Jenkins
 
-![Jenkinsfile di frontend](jenkinsfile.png)
+![Jenkinsfile di frontend](image/jenkinsfile.png)
 
 Foto di atas hanya memperlihatkan separuh jadi bisa lihat keseluruhan disini
 
@@ -84,7 +84,7 @@ Nanti job ini akan ke trigger di github karena user key yang dipakai sudah konek
 
 ## Gitlab Action
 
-![Environment di Repo backend](github-env.png)
+![Environment di Repo backend](image/github-env.png)
 
 Di dalam environment saya setup secrets dan variable yang nanti akan digunakan untuk workflows github action
 
@@ -100,7 +100,7 @@ Di dalam environment saya setup secrets dan variable yang nanti akan digunakan u
 
 ### Workflows GitHub Action
 
-![Workflows Backend](github-action.png)
+![Workflows Backend](image/github-action.png)
 
 Foto di atas hanya memperlihatkan separuh jadi bisa lihat keseluruhan disini
 
