@@ -134,7 +134,7 @@ Service:
 portnya saya samakan 5000 dengan port backend
 
 Ingress:  
-![alt text](image/backend-ingress.png)
+![alt text](image/backend-ingress.png)  
 secretName nya itu untuk konek ke certificatenya yang akan saya jelaskan nanti
 
 ### Frontend
@@ -149,7 +149,7 @@ Deployment:
 Service:  
 ![alt text](image/frontend-service.png)
 
-Ingress:
+Ingress:  
 ![alt text](image/frontend-ingress.png)
 
 ## Cert Manager
