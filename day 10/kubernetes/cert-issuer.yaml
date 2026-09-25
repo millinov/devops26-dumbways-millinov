@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-api-token
+  namespace: cert-manager
+type: Opaque
+stringData:
+  api-token: lolramdon123
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-wildcard
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: lolrandom@gmail.com
+    privateKeySecretRef:
+      name: wildcard-key-kubernetes
+    solvers:
+    - dns01:
+        cloudflare:
+          email: lolrandom@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token
+            key: api-token
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wayshub-wildcard-cert
+  namespace: wayshub #
+spec:
+  secretName: wayshub-wildcard-secret
+  issuerRef:
+    name: letsencrypt-wildcard
+    kind: ClusterIssuer
+  dnsNames:
+    - "millinov.studentdumbways.my.id"
+    - "*.millinov.studentdumbways.my.id" 

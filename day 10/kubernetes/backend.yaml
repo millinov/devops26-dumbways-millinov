@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backend-env
+  namespace: wayshub
+type: Opaque
+stringData:
+  secret: lolramdon123
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wayshub-backend-deployment
+  namespace: wayshub
+  labels:
+    app: wayshub-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wayshub-backend
+  template:
+    metadata:
+      labels:
+        app: wayshub-backend
+    spec:
+      containers:
+      - name: wayshub-backend
+        image: millinovz/wayshub:kub
+        envFrom:
+        - secretRef:
+            name: backend-env
+        ports:
+        - containerPort: 5000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wayshub-backend-service
+  namespace: wayshub
+spec:
+  selector:
+    app: wayshub-backend
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wayshub-backend-ingress
+  namespace: wayshub
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  labels:
+    app.kubernetes/name: wayshub-backend-ingress
+spec:
+  ingressClassName: "nginx"
+  tls:
+  - hosts:
+    - api.millinov.studentdumbways.my.id
+    secretName: wayshub-wildcard-secret
+  rules:
+  - host: api.millinov.studentdumbways.my.id 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wayshub-backend-service
+            port:
+              number: 5000
