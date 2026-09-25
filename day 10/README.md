@@ -172,7 +172,7 @@ ClusterIssuer:
 ![alt text](image/cert-clusterissuer.png)  
 
 Certificate:  
-![alt text](image/cert-certificate.png)
+![alt text](image/cert-certificate.png)  
 Nanti secretName-nya ini dipanggil lagi di Ingress aplikasi, sudah dibuat settingnya wildcard
 
 ## Dokumentasi lainnya
