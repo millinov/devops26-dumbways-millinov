@@ -1,0 +1,124 @@
+def secret = 'fproject_ssh'
+
+pipeline{
+    agent {
+        label 'build-server'
+    }
+
+    environment {
+        IMAGE_NAME = 'registry.millinov.studentdumbways.my.id/frontend-dumbmerch:v1'
+        USER_APP1 = credentials('USER_APP1')
+        USER_APP2 = credentials('USER_APP2')
+        SSH_PASS = credentials('SSH_PASS')
+    }
+
+    stages{
+
+        stage ('Checkout SCM'){
+         steps{
+                checkout scm
+            }
+        }
+
+        stage ('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "${tool 'SonarScanner'}/bin/sonar-scanner"
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage ('Build frontend image'){
+            steps{
+                sh '''
+                    docker build --pull -t $IMAGE_NAME .
+                '''
+            }
+        }
+
+        stage ('Test Frontend Image') {
+            steps {
+                sh '''
+                    set -e
+
+                    docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        aquasec/trivy:latest \
+                        image \
+                        --severity HIGH,CRITICAL \
+                        --exit-code 1 \
+                        $IMAGE_NAME
+                '''
+            }
+        }
+
+        stage('Test Docker Container Frontend Dumbmerch') {
+            steps {
+                sh '''
+                    set -e
+
+                    docker rm -f test-container 2>/dev/null || true
+
+                    docker run -d \
+                        --name test-container \
+                        -p 5001:80 \
+                        $IMAGE_NAME
+
+                    sleep 10
+
+                    curl -f http://localhost:5001/ || {
+                        docker logs test-container
+                        docker rm -f test-container
+                        echo "Testing frontend docker failed!"
+                        exit 1
+                    }
+
+                    docker rm -f test-container
+                '''
+            }
+        }
+
+        stage ('Push Frontend app to registry'){
+            steps{
+                sh '''
+                    docker push $IMAGE_NAME
+                    echo "Docker push Frontend Image"
+                '''
+            }
+        }
+
+        stage ('Deploy frontend on app server 1'){
+            steps{
+                sshagent(credentials: [secret]) {
+                    sh '''sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -p 3333 $USER_APP1 << EOF
+                    cd ~/docker
+                    docker compose pull frontend
+		            docker compose up -d frontend
+                    exit
+                    EOF'''
+                }
+            }
+        }
+
+        stage ('Deploy frontend on app server 2'){
+            steps{
+                sshagent(credentials: [secret]) {
+                    sh '''sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -p 3333 $USER_APP2 << EOF
+                    cd ~/docker
+                    docker compose pull frontend
+		            docker compose up -d frontend
+                    exit
+                    EOF'''
+                }
+            }
+        }
+    }
+}

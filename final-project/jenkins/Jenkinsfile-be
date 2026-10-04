@@ -1,0 +1,128 @@
+def secret = 'fproject_ssh'
+
+pipeline{
+    agent {
+        label 'build-server'
+    }
+
+    environment {
+        IMAGE_NAME = 'registry.millinov.studentdumbways.my.id/backend-dumbmerch:v1'
+        USER_APP1 = credentials('USER_APP1')
+        USER_APP2 = credentials('USER_APP2')
+        SSH_PASS = credentials('SSH_PASS')
+    }
+
+    stages{
+
+        stage ('Checkout SCM'){
+         steps{
+                checkout scm
+            }
+        }
+
+        stage ('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "${tool 'SonarScanner'}/bin/sonar-scanner"
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage ('Build backend image'){
+            steps{
+                sh '''
+                    docker build --pull -t $IMAGE_NAME .
+                '''
+            }
+        }
+
+        stage ('Test Backend Image') {
+            steps {
+                sh '''
+                    set -e
+
+                    docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v ./.trivyignore:/workspace/.trivyignore \
+                        aquasec/trivy:latest \
+                        image \
+                        --severity HIGH,CRITICAL \
+                        --ignorefile /workspace/.trivyignore \
+                        --exit-code 1 \
+                        $IMAGE_NAME
+                '''
+            }
+        }
+
+        stage('Test Docker Container Backend Dumbmerch') {
+            steps {
+                sh '''
+                    docker rm -f test-container 2>/dev/null || true
+
+                    docker run -d \
+                        --name test-container \
+                        -v ./.env:/usr/src/app/.env:ro \
+                        -p 5001:5000 \
+                        $IMAGE_NAME
+
+                    sleep 10
+
+                     curl -i \
+                    -X POST http://localhost:5001/api/v1/login \
+                    -H "Content-Type: application/json" \
+                    -d '{"email":"test@test.com","password":"test"}' || {
+                                docker logs test-container
+                                docker rm -f test-container
+                                echo "Testing frontend docker failed!"
+                                exit 1
+                            }
+
+                    docker rm -f test-container
+                '''
+            }
+        }
+
+        stage ('Push Frontend app to registry'){
+            steps{
+                sh '''
+                    docker push $IMAGE_NAME
+                    echo "Docker push Frontend Image"
+                '''
+            }
+        }
+
+        stage ('Deploy backend on app server 1'){
+            steps{
+                sshagent(credentials: [secret]) {
+                    sh '''sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -p 3333 $USER_APP1 << EOF
+                    cd ~/docker
+                    docker compose pull backend
+		            docker compose up -d backend
+                    exit
+                    EOF'''
+                }
+            }
+        }
+
+        stage ('Deploy backend on app server 2'){
+            steps{
+                sshagent(credentials: [secret]) {
+                    sh '''sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -p 3333 $USER_APP2 << EOF
+                    cd ~/docker
+                    docker compose pull backend
+		            docker compose up -d backend
+                    exit
+                    EOF'''
+                }
+            }
+        }
+    }
+}
