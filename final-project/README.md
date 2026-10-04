@@ -7,6 +7,10 @@ Buat pengerjaan saya akan buat dari cara pengerjaan saya baru saya pinpoint dari
 
 *Koding-koding di folder sudah dirubah dan hanya digunakan sebagai contoh yang saya kerjakan
 
+[Dumbmerch Staging](https://staging.millinov.studentdumbways.my.id/)  
+
+[Dumbmerch Production](https://millinov.studentdumbways.my.id/)
+
 ## Pertama, setup terraform
 
 ![Terraform](image/terraform-apply.png)
