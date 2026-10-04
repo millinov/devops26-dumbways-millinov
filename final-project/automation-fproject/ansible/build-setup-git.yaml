@@ -1,0 +1,86 @@
+- name: Configure Git on Build VM
+  hosts: build_server
+
+  tasks:
+  
+    - name: Check If Git Is Installed
+      command: git version
+      register: git_valid
+      changed_when: false
+      failed_when: false
+
+    - name: Debug Command Output
+      debug:
+        var: git_valid 
+
+    - name: If no git, run install git
+      when: git_valid.rc != 0
+      include_tasks:
+        file: "{{ ansible_directory }}/tasks/install-git.yaml"
+        apply:
+          become: true 
+
+    - name: Configure Git user.name
+      community.general.git_config:
+        name: user.name
+        scope: global
+        value: "{{ git_username }}"
+
+    - name: Configure Git user.mail
+      community.general.git_config:
+        name: user.name
+        scope: global
+        value: "{{ user_email }}"
+
+    - name: Check GitHub SSH Connection
+      command: ssh -T -o StrictHostKeyChecking=no git@github.com
+      register: github_response
+      changed_when: false
+      failed_when: false
+
+    - name: Debug GitHub response
+      debug:
+        var: github_response 
+
+    - name: Clone repository Dumbmerch
+      when: github_response.rc == 1
+      git:
+        repo: "{{ item.repo }}"
+        dest: "{{ item.dest }}"
+        version: master
+      loop:
+        - repo: "git@github.com:demo-dumbways/fe-dumbmerch.git"
+          dest: "{{ ansible_user_dir }}/project/fe-dumbmerch"
+        
+        - repo: "git@github.com:demo-dumbways/be-dumbmerch.git"
+          dest: "{{ ansible_user_dir }}/project/be-dumbmerch"
+          
+    - name: Change Dumbmerch repository origin
+      when: github_response.rc == 1
+      command:
+        cmd: "{{ item.cmd }}"
+        chdir: "{{ item.chdir }}"
+      loop:
+        - cmd: "git remote set-url origin git@github.com:millinov/fe-dumbmerch.git"
+          chdir: "{{ ansible_user_dir }}/project/fe-dumbmerch"
+        
+        - cmd: "git remote set-url origin git@github.com:millinov/be-dumbmerch.git"
+          chdir: "{{ ansible_user_dir }}/project/be-dumbmerch"
+
+    - name: Change Dumbmerch repository branch to main
+      when: github_response.rc == 1
+      command:
+        cmd: "git branch -M main"
+        chdir: "{{ item }}"
+      loop:
+        - "{{ ansible_user_dir }}/project/fe-dumbmerch"
+        - "{{ ansible_user_dir }}/project/be-dumbmerch"
+
+    - name: Push Dumbmerch to new origin repository
+      when: github_response.rc == 1
+      command:
+        cmd: "git push -u origin main"
+        chdir: "{{ item }}"
+      loop:
+        - "{{ ansible_user_dir }}/project/fe-dumbmerch"
+        - "{{ ansible_user_dir }}/project/be-dumbmerch"

@@ -1,0 +1,14 @@
+- name: Dependencies Installer
+  hosts: build_server
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: Installing dependencies
+      apt:
+        name: 
+          - openjdk-21-jre
+          - sshpass
+        state: present
+        update_cache: true

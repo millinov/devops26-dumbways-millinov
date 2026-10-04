@@ -1,0 +1,38 @@
+- name: Deploy reverse-proxy
+  hosts: web_server
+  become: true
+
+  tasks:
+
+    - name: Installing Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Copying Reverse Proxy Settings
+      copy:
+        src: "{{ item }}"
+        dest: /etc/nginx/sites-enabled/
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '644'
+      with_fileglob:
+        - "{{ ansible_directory }}/rev-proxy/*"
+
+    - name: Check if Nginx configuration is valid
+      command: nginx -t
+      register: nginx_valid
+      changed_when: false
+      failed_when: false
+
+    - name: Show nginx validity
+      debug:
+        var: nginx_valid
+
+    - name: Applying Reverse Proxy Settings
+      when: nginx_valid.rc == 0
+      systemd_service:
+        state: restarted
+        daemon_reload: true
+        name: nginx

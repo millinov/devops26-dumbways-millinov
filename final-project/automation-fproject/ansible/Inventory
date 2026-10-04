@@ -1,0 +1,55 @@
+[web_server]
+34.101.151.1
+
+[build_server]
+34.101.219.14
+
+[kube_master]
+34.50.65.174
+
+[kube_worker]
+kuber-worker-1
+kuber-worker-2
+
+[db_server]
+db-fproject
+
+[monitor_server]
+monitor-fproject
+
+[jenkins]
+cicd-fproject-1
+
+[sonarqube]
+cicd-fproject-2
+
+[appserver]
+appserver-fproject-1
+appserver-fproject-2
+
+# Parents layer 1
+# ===============
+
+[public_nodes:children]
+web_server
+build_server
+kube_master
+
+[private_nodes:children]
+db_server
+monitor_server
+jenkins
+sonarqube
+appserver
+kube_worker
+
+# Parents layer 2
+# ===============
+
+[productions_env:children]
+kube_master
+kube_worker
+
+[staging_env:children]
+public_nodes
+private_nodes

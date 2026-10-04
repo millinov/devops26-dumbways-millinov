@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dumbmerch-backend-deployment
+  namespace: dumbmerch
+  labels:
+    app: dumbmerch-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dumbmerch-backend
+  template:
+    metadata:
+      labels:
+        app: dumbmerch-backend
+    spec:
+      containers:
+      - name: dumbmerch-backend
+        image: registry.millinov.studentdumbways.my.id/backend-dumbmerch:prod
+        envFrom:
+        - secretRef:
+            name: backend-env
+        ports:
+        - containerPort: 5000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: dumbmerch-backend-service
+  namespace: dumbmerch
+spec:
+  selector:
+    app: dumbmerch-backend
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dumbmerch-backend-ingress
+  namespace: dumbmerch
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  labels:
+    app.kubernetes/name: dumbmerch-backend-ingress
+spec:
+  ingressClassName: "nginx"
+  tls:
+  - hosts:
+    - api.millinov.studentdumbways.my.id
+    secretName: dumbmerch-wildcard-secret
+  rules:
+  - host: api.millinov.studentdumbways.my.id  # Replace with your actual domain or IP
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dumbmerch-backend-service
+            port:
+              number: 5000

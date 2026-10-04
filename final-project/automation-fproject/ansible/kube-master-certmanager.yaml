@@ -1,0 +1,26 @@
+- name: Deploy K3S - Lightweight Kubernetes on Kube Master Node
+  hosts: kube_master
+  become: true 
+
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+  tasks:
+
+    - name: Check If K3S Is Installed
+      command: systemctl is-active k3s
+      register: k3s_status
+      changed_when: false
+      failed_when: false
+
+    - name: Debug K3S Output
+      debug:
+        var: k3s_status 
+        
+    - name: if exist, install cert manager
+      when: k3s_status.rc == 0
+      block:
+
+        - name: Install Cert manager
+          command:
+            cmd: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.2/cert-manager.yaml

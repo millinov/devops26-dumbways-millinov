@@ -1,0 +1,9 @@
+- name: Run update and upgrade apt
+  include_tasks:
+    file: update-upgrade.yaml
+
+- name: Install git
+  apt:
+    name: git
+    state: present
+    update_cache: true

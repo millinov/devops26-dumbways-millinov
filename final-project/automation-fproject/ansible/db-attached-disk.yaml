@@ -1,0 +1,28 @@
+- name: Mount attached disk to database
+  hosts: db_server
+  become: true
+  vars:
+    disk_path: "/dev/disk/by-id/google-database-disk"
+    mount_path: "/mnt/disks/data"
+
+  tasks:
+    - name: Ensure mounth path directory exist
+      file:
+        path: "{{ mount_path }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Format the disk
+      community.general.filesystem:
+        fstype: ext4
+        dev: "{{ disk_path }}"
+
+    - name: Mount the disk and update
+      ansible.posix.mount:
+        path: "{{ mount_path }}"
+        src: "{{ disk_path }}"
+        fstype: ext4
+        opts: discard,defaults,nofail
+        state: mounted

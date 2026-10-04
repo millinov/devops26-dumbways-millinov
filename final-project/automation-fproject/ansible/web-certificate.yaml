@@ -1,0 +1,94 @@
+- name: Get Wildcard Certificate
+  hosts: web_server
+  become: true
+
+  tasks:
+    - name: Check if certbot exist
+      command: certbot --version
+      register: certbot_valid
+      failed_when: false
+      changed_when: false
+    
+    - name: If no certbot, run install certbot
+      when: certbot_valid.rc != 0
+      include_tasks:
+        file: "{{ ansible_directory }}/tasks/install-certbot.yml"
+
+    - name: Check if cloudflare token already exist
+      stat:
+        path: /root/.secrets/certbot/cloudflare.ini
+      register: cloudflare_check
+
+    - name: Create Certbot secrets directory
+      when: cloudflare_check.stat is defined and cloudflare_check.stat.exists == false
+      become: true
+      file:
+        path: /root/.secrets/certbot
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Putting Cloudflare token
+      when: cloudflare_check.stat is defined and cloudflare_check.stat.exists == false
+      copy:
+        src: cloudflare.ini
+        dest: /root/.secrets/certbot/cloudflare.ini
+        owner: root
+        group: root
+        mode: '0600'
+
+    # - name: Check if SSL certificate already exists for this domain
+    #   stat:
+    #     path: "/etc/letsencrypt/live/staging.millinov.studentdumbways.my.id/fullchain.pem"
+    #   register: cert_check
+
+    - name: Run certbot
+      # when: cert_check.stat is defined and cert_check.stat.exists == false
+      command: >
+        certbot certonly
+        --dns-cloudflare
+        --dns-cloudflare-credentials /root/.secrets/certbot/cloudflare.ini
+        --non-interactive
+        --agree-tos
+        --expand
+        --dns-cloudflare-propagation-seconds 60
+        -m {{ user_email }}
+        -d staging.millinov.studentdumbways.my.id
+        -d "*.staging.millinov.studentdumbways.my.id"
+        -d monitoring.millinov.studentdumbways.my.id
+        -d registry.millinov.studentdumbways.my.id
+        -d "*.exporter.millinov.studentdumbways.my.id"
+        -d prom.millinov.studentdumbways.my.id
+        -d jenkins.millinov.studentdumbways.my.id
+        -d sonarqube.millinov.studentdumbways.my.id
+
+    - name: Check existing Certbot certificates
+      command: certbot certificates
+      register: certbot_certs
+      changed_when: false
+      failed_when: false
+
+    - name: Show existing certificates
+      debug:
+        var: certbot_certs
+
+    - name: Install cron
+      apt:
+        name: cron
+        state: present
+        update_cache: true
+
+    - name: Enable and start cron
+      systemd:
+        name: cron
+        state: started
+        enabled: true
+
+    - name: Add certbot renewal cronjob
+      cron:
+        name: Certbot renewal Check
+        minute: "0"
+        hour: "0,12"
+        job: "/opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q"
+        state: present

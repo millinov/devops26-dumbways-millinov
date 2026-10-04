@@ -1,0 +1,23 @@
+- name: Building Dumbmerch Frontend app in build server
+  hosts: build_server
+
+  tasks:
+
+    - name: Pull latest code
+      git:
+        repo: "git@github.com:millinov/fe-dumbmerch.git"
+        dest: "{{ ansible_user_dir }}/project/fe-dumbmerch"
+        version: staging
+        update: true
+
+    - name: Build and push image
+      community.docker.docker_image:
+        name: "registry.millinov.studentdumbways.my.id/frontend-dumbmerch:v1"
+        source: build
+        force_source: true
+        build:
+          path: "{{ ansible_user_dir }}/project/fe-dumbmerch"
+          nocache: true
+        push: true
+
+

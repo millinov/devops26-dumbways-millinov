@@ -1,0 +1,33 @@
+- name: Deploy Kubernetes manifests
+  hosts: kube_master
+  become: true
+
+  tasks:
+
+    - name: Enable and start K3S
+      systemd:
+        name: k3s
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Copy Kubernetes manifests
+      copy:
+        src: "{{ ansible_directory }}/kubernetes/"
+        dest: "{{ '/home/' + ansible_user }}/kubernetes/"
+        mode: "0644"
+
+    - name: Apply Kubernetes manifests
+      command:
+        cmd: "kubectl apply -f {{ '/home/' + ansible_user }}/kubernetes/"
+
+    - name: Get Kubernetes
+      command:
+        cmd: kubectl get all -n dumbmerch
+      register: K3S_get
+      changed_when: false
+      failed_when: false
+
+    - name: Debug K3S_get Output
+      debug:
+        var: K3S_get 

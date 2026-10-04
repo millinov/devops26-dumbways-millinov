@@ -1,0 +1,8 @@
+ansible_user: finaltask-miral
+ansible_port: 3333
+ansible_config: ansible.cfg
+ansible_python_interpreter: /usr/bin/python3
+ansible_directory: /home/miral/automation-fproject/ansible
+user_email: milinovadmiral@gmail.com
+git_username: millinov
+user_password: $6$bDhDmUVxKSOMcyLu$TdSptLTu491Yk5KNSlghEMrl8prIpL97zu9oN3cwq3k2JTo0alf.CfInR1mLyPrEj3QHmiA3RfDM5mIf/qdDR/

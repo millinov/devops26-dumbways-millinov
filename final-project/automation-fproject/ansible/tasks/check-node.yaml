@@ -1,0 +1,48 @@
+- name: Check if Node Version Manager is installed
+  shell: |
+    source "$HOME/.nvm/nvm.sh"
+    nvm --version
+  args:
+    executable: /bin/bash
+  register: nvm_valid
+  changed_when: false
+  failed_when: false
+
+- name: Debug Command nvm_valid Output
+  debug:
+    var: nvm_valid
+
+- name: Run update and upgrade apt
+  when: nvm_valid.rc != 0
+  include_tasks:
+    file: "{{ ansible_directory }}/tasks/update-upgrade.yaml"
+    apply:
+      become: true 
+
+- name: If no nvm, run install nvm
+  when: nvm_valid.rc != 0
+  shell:
+    cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
+    chdir: "{{ ansible_user_dir }}"
+
+- name: Check if Node v16 is installed
+  shell: |
+    source "$HOME/.nvm/nvm.sh"
+    nvm ls | grep v16
+  args:
+    executable: /bin/bash
+  register: node_valid
+  changed_when: false
+  failed_when: false
+
+- name: Debug Command node_valid Output
+  debug:
+    var: node_valid
+
+- name: If node 16 not installed, run install node 16
+  when: node_valid.rc != 0
+  shell: |
+    source "$HOME/.nvm/nvm.sh"
+    nvm install 16
+  args:
+    executable: /bin/bash

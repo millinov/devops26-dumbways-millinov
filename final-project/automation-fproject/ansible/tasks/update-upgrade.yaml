@@ -1,0 +1,4 @@
+- name: Sudo apt update && Sudo apt upgrade -y
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: yes

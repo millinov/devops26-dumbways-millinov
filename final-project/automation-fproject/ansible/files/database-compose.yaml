@@ -1,0 +1,51 @@
+services:
+
+  database:
+    container_name: db-dumbmerch
+    image: postgres:latest
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: finaltask-miral
+      POSTGRES_PASSWORD: "miral1906"
+      POSTGRES_DB: dumbmerch
+
+    ports:
+      - 5432:5432
+
+    volumes:
+      # - /mnt/disks/data/postgres:/var/lib/postgresql
+      - /home/finaltask-miral/storage:/var/lib/postgresql
+      
+  nodexp:
+    container_name: node-exporter
+    image: prom/node-exporter
+    
+    ports:
+      - 9100:9100
+
+    volumes:
+     - "/proc:/host/proc:ro"
+     - "/sys:/host/sys:ro"
+     - "/:/rootfs:ro"
+     
+    command:
+      - "--web.listen-address=:9100"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+      - "--collector.filesystem.ignored-mount-points='^/(sys|proc|dev|host|etc|rootfs|var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'"
+      
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+      
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro   

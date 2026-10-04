@@ -1,0 +1,2 @@
+# Untuk akses VM tanpa public IP
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="gcloud compute start-iap-tunnel %h %p --listen-on-stdin --project=project-dbbc895c-751b-4d44-899 --zone=asia-southeast2-b"'

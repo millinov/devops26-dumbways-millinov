@@ -1,0 +1,37 @@
+- name: Testing Dumbmerch front-end in build server
+  hosts: build_server
+
+  tasks:
+
+    - name: Check node exist
+      include_tasks:
+        file: "{{ ansible_directory }}/tasks/check-node.yaml"
+
+    - name: Pull latest code
+      git:
+        repo: "git@github.com:millinov/fe-dumbmerch.git"
+        dest: "{{ ansible_user_dir }}/project/fe-dumbmerch"
+        version: staging
+        update: true
+
+    - name: Install npm dependencies
+      shell: |
+        source "$HOME/.nvm/nvm.sh"
+        nvm use 16
+        npm ci
+        npm install pm2 -g
+      args:
+        executable: /bin/bash
+        chdir: "{{ ansible_user_dir }}/project/fe-dumbmerch"
+
+    - name: Run dumbmerch FE
+      shell: |
+        source "$HOME/.nvm/nvm.sh"
+        nvm use 16
+        pm2 startOrRestart ecosystem.config.js
+        pm2 save
+      args:
+        executable: /bin/bash
+        chdir: "{{ ansible_user_dir }}/project/fe-dumbmerch"
+
+

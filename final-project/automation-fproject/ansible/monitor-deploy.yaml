@@ -1,0 +1,67 @@
+- name: Deploying Monitor apps (Grafana & Prometheus)
+  hosts: monitor_server
+
+  tasks:
+
+    - name: Check If Docker Is Installed
+      command: docker --version
+      register: docker_valid
+      changed_when: false
+      failed_when: false
+
+    - name: Debug Docker Output
+      debug:
+        var: docker_valid 
+
+    - name: If no docker, run install docker
+      when: docker_valid.rc != 0
+      include_tasks:
+        file: "{{ ansible_directory }}/tasks/install-docker.yaml"
+        apply:
+          become: true 
+
+    - name: If yes docker are running
+      when: not docker_valid.failed
+      block:
+        - name: Ensure docker directory exists
+          ansible.builtin.file:
+            path: "{{ ansible_user_dir }}/docker"
+            state: directory
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0755'
+
+        - name: Copying docker-compose
+          copy:
+            src: monitoring-compose.yaml
+            dest: "{{ ansible_user_dir }}/docker/docker-compose.yaml"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0755'
+        
+        - name: Copying Prometheus Config
+          copy:
+            src: prometheus.yaml
+            dest: "{{ ansible_user_dir }}/docker/prometheus.yaml"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0644'
+
+        - name: Copying Prometheus Web Config
+          copy:
+            src: web-prometheus.yaml
+            dest: "{{ ansible_user_dir }}/docker/web-prometheus.yaml"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0644'
+        
+        - name: Turn off docker compose first
+          command: docker compose down
+          failed_when: false
+          args:
+            chdir: "{{ ansible_user_dir }}/docker"
+        
+        - name: Run docker compose
+          command: docker compose up -d
+          args:
+            chdir: "{{ ansible_user_dir }}/docker"

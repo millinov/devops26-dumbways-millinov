@@ -1,0 +1,24 @@
+- name: Check if golang is installed
+  command: go version
+  register: go_valid
+  changed_when: false
+  failed_when: false
+
+- name: Debug Command go_valid Output
+  debug:
+    var: go_valid
+
+- name: Run update and upgrade apt
+  when: go_valid.rc != 0
+  include_tasks:
+    file: "{{ ansible_directory }}/tasks/update-upgrade.yaml"
+    apply:
+      become: true 
+
+- name: If there's no golang, run install golang
+  when: go_valid.rc != 0
+  become: true
+  apt:
+    name: golang-go
+    state: present
+    update_cache: yes

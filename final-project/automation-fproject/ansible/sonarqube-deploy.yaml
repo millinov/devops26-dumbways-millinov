@@ -1,0 +1,63 @@
+- name: Deploying Sonarqube
+  hosts: sonarqube
+
+  tasks:
+
+    - name: Check If Docker Is Installed
+      command: docker --version
+      register: docker_valid
+      changed_when: false
+      failed_when: false
+
+    - name: Debug Docker Output
+      debug:
+        var: docker_valid 
+
+    - name: If no docker, run install docker
+      when: docker_valid.rc != 0
+      include_tasks:
+        file: "{{ ansible_directory }}/tasks/install-docker.yaml"
+        apply:
+          become: true 
+
+    - name: If yes docker are running
+      when: not docker_valid.failed
+      block:
+        - name: Ensure docker directory exists
+          ansible.builtin.file:
+            path: "{{ ansible_user_dir }}/docker"
+            state: directory
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0755'
+
+        - name: Copying docker-compose
+          copy:
+            src: sonarqube-compose.yaml
+            dest: "{{ ansible_user_dir }}/docker/docker-compose.yaml"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0755'
+
+        - name: Check Docker Compose status
+          command:
+            cmd: docker compose ps --status running -q
+            chdir: "{{ ansible_user_dir }}/docker"
+          register: compose_check
+          changed_when: false
+          failed_when: false
+
+        - name: Debug compose_check Output
+          debug:
+            var: compose_check 
+
+        - name: Turn off docker compose first
+          when: compose_check.stdout != ""
+          command: 
+            cmd: docker compose down
+            chdir: "{{ ansible_user_dir }}/docker"
+        
+        - name: Run docker compose
+          command: 
+            cmd: docker compose up -d --pull always
+            chdir: "{{ ansible_user_dir }}/docker"

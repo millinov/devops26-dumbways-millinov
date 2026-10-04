@@ -1,0 +1,71 @@
+services:
+
+  frontend:
+    container_name: frontend-dumbmerch
+    image: registry.millinov.studentdumbways.my.id/frontend-dumbmerch:v1
+    restart: unless-stopped
+
+    ports:
+      - 3000:80
+
+    environment:
+      REACT_APP_BASEURL: https://api.staging.millinov.studentdumbways.my.id/api/v1
+
+  backend:
+    container_name: backend-dumbmerch
+    image: registry.millinov.studentdumbways.my.id/backend-dumbmerch:v1
+    restart: unless-stopped
+    stdin_open: true
+
+    ports:
+      - 5000:5000
+      
+    environment:
+      SECRET_KEY: bolehapaaja
+      PATH_FILE: http://localhost:5000/uploads/
+      SERVER_KEY: SB-Mid-server-fJAy6udMPnJCIyFguce8Eot3
+      CLIENT_KEY: SB-Mid-client-YUogx3u74Gq9MTMS
+      EMAIL_SYSTEM: demo.dumbways@gmail.com
+      PASSWORD_SYSTEM: rbgmgzzcmrfdtbpu
+      DB_HOST: 10.184.0.8
+      DB_USER: finaltask-miral
+      DB_PASSWORD: miral1906
+      DB_NAME: dumbmerch
+      DB_PORT: 5432 
+      PORT: 5000
+
+    volumes:
+      - ./empty.env:/usr/src/app/.env:ro
+      
+  nodexp:
+    container_name: node-exporter
+    image: prom/node-exporter
+    
+    ports:
+      - 9100:9100
+
+    volumes:
+     - "/proc:/host/proc:ro"
+     - "/sys:/host/sys:ro"
+     - "/:/rootfs:ro"
+     
+    command:
+      - "--web.listen-address=:9100"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+      - "--collector.filesystem.ignored-mount-points='^/(sys|proc|dev|host|etc|rootfs|var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'"
+      
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+      
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro     

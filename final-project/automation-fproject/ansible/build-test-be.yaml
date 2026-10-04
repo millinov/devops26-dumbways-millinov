@@ -1,0 +1,41 @@
+- name: Testing Dumbmerch front-end in build server
+  hosts: build_server
+
+  tasks:
+
+    - name: Check node exist
+      include_tasks:
+        file: "{{ ansible_directory }}/tasks/check-node.yaml"
+    
+    - name: Check golang exist
+      include_tasks:
+        file: "{{ ansible_directory }}/tasks/check-golang.yaml"
+
+    - name: Pull latest code
+      git:
+        repo: "git@github.com:millinov/be-dumbmerch.git"
+        dest: "{{ ansible_user_dir }}/project/be-dumbmerch"
+        version: staging
+        update: true
+
+    - name: Install go dependencies
+      command:
+        cmd: go mod download
+        chdir: "{{ ansible_user_dir }}/project/be-dumbmerch"
+
+    - name: Build dumbmerch backend with golang
+      command:
+        cmd: go build -o be-dumbmerch-go
+        chdir: "{{ ansible_user_dir }}/project/be-dumbmerch"
+
+    - name: Run dumbmerch FE
+      shell: |
+        source "$HOME/.nvm/nvm.sh"
+        nvm use 16
+        pm2 startOrRestart ecosystem.config.js
+        pm2 save
+      args:
+        executable: /bin/bash
+        chdir: "{{ ansible_user_dir }}/project/be-dumbmerch"
+
+

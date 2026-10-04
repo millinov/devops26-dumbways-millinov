@@ -1,0 +1,28 @@
+- name: Increase bucket size so it could reverse-proxy more server
+  hosts: web_server
+  become: true
+
+  tasks:
+
+    - name: Set Nginx server name hash bucket size
+      lineinfile:
+        path: /etc/nginx/nginx.conf
+        regexp: '^\s*server_names_hash_bucket_size\s+'
+        line: '    server_names_hash_bucket_size 128;'
+
+    - name: Check if Nginx configuration is valid
+      command: nginx -t
+      register: nginx_valid
+      changed_when: false
+      failed_when: false
+
+    - name: Show nginx validity
+      debug:
+        var: nginx_valid
+
+    - name: Applying Reverse Proxy Settings
+      when: nginx_valid.rc == 0
+      systemd_service:
+        state: restarted
+        daemon_reload: true
+        name: nginx

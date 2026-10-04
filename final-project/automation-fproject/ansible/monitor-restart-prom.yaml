@@ -1,0 +1,38 @@
+- name: Restarting Prometheus
+  hosts: monitor_server
+
+  tasks:
+
+    - name: Check If Docker Is Installed
+      command: docker --version
+      register: docker_valid
+      changed_when: false
+      failed_when: false
+
+    - name: Debug Docker Output
+      debug:
+        var: docker_valid 
+
+    - name: If no docker, run install docker
+      when: docker_valid.rc != 0
+      include_tasks:
+        file: "{{ ansible_directory }}/tasks/install-docker.yaml"
+        apply:
+          become: true 
+
+    - name: If yes docker are running
+      when: not docker_valid.failed
+      block:
+        
+        - name: Copying Prometheus Config
+          copy:
+            src: prometheus.yaml
+            dest: "{{ ansible_user_dir }}/docker/prometheus.yaml"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0644'
+        
+        - name: Restart Prometheus
+          command: docker compose restart prometheus
+          args:
+            chdir: "{{ ansible_user_dir }}/docker"

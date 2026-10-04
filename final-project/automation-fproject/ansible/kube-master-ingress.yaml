@@ -1,0 +1,35 @@
+- name: Deploy K3S - Lightweight Kubernetes on Kube Master Node
+  hosts: kube_master
+  become: true 
+
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+  tasks:
+
+    - name: Check If K3S Is Installed
+      command: systemctl is-active k3s
+      register: k3s_status
+      changed_when: false
+      failed_when: false
+
+    - name: Debug K3S Output
+      debug:
+        var: k3s_status 
+        
+    - name: if exist, install helm then ingress nginx
+      when: k3s_status.rc == 0
+      block:
+        - name: Download Helm installer
+          get_url:
+            url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4
+            dest: /tmp/get_helm.sh
+            mode: '0700'
+
+        - name: Run Helm installer
+          command:
+            cmd: /tmp/get_helm.sh
+
+        - name: Install NGINX Ingress
+          command:
+            cmd: helm install nginx oci://ghcr.io/nginx/charts/nginx-ingress --version 2.7.3

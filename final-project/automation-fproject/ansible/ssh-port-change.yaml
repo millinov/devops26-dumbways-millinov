@@ -1,0 +1,82 @@
+---
+# Buat private
+- name: Secure SSH Port Transition to 3333
+  hosts: private_nodes
+  become: true
+  gather_facts: false
+  vars:
+    ansible_port: 22
+
+  pre_tasks:
+  
+    - name: Check if SSH is already listening on port 3333
+      shell: |
+        ss -lnt | grep -q ':3333 '
+      register: port_3333_check
+      changed_when: false
+      failed_when: false
+
+  tasks:
+
+    - name: Change SSH port to 3333 in sshd_config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Port '
+        line: 'Port 3333'
+        state: present
+      when: port_3333_check.rc != 0
+
+    - name: Restart SSH
+      systemd_service:
+        name: ssh
+        state: restarted
+        daemon_reload: true
+      when: port_3333_check.rc != 0
+
+    - name: Set fact straight to port 3333
+      set_fact:
+        ansible_port: 3333
+
+    - name: Verify connection works perfectly on the new port
+      ping:
+
+# Buat public
+- name: Secure SSH Port Transition to 3333
+  hosts: public_nodes
+  become: true
+  gather_facts: false
+  vars:
+    ansible_port: 22
+
+  pre_tasks:
+  
+    - name: Check if SSH is already listening on port 3333
+      shell: |
+        ss -lnt | grep -q ':3333 '
+      register: public_port_3333_check
+      changed_when: false
+      failed_when: false
+
+  tasks:
+
+    - name: Change SSH port to 3333 in sshd_config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Port '
+        line: 'Port 3333'
+        state: present
+      when: public_port_3333_check.rc != 0
+
+    - name: Restart SSH
+      systemd_service:
+        name: ssh
+        state: restarted
+        daemon_reload: true
+      when: public_port_3333_check.rc != 0
+
+    - name: Dynamically switch Ansible engine to use port 3333 for subsequent tasks
+      set_fact:
+        ansible_port: 3333
+
+    - name: Verify connection works perfectly on the new port
+      ping:

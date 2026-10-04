@@ -1,0 +1,33 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-wildcard
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: milinovadmiral@gmail.com
+    privateKeySecretRef:
+      name: wildcard-key-kubernetes
+    solvers:
+    - dns01:
+        cloudflare:
+          email: milinovadmiral@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token
+            key: api-token
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: dumbmerch-wildcard-cert
+  namespace: dumbmerch #
+spec:
+  secretName: dumbmerch-wildcard-secret
+  issuerRef:
+    name: letsencrypt-wildcard
+    kind: ClusterIssuer
+  dnsNames:
+    - "millinov.studentdumbways.my.id"
+    - "*.millinov.studentdumbways.my.id" 

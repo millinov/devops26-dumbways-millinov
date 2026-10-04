@@ -1,0 +1,151 @@
+global:
+  evaluation_interval: 10s
+
+scrape_configs:
+- job_name: appserver-1
+  scrape_interval: 10s
+  scheme: https
+  static_configs:
+  - targets:
+    - app1.exporter.millinov.studentdumbways.my.id
+    labels:
+      server: "app-server-1"
+
+- job_name: appserver-2
+  scrape_interval: 10s
+  scheme: https
+  static_configs:
+  - targets:
+    - app2.exporter.millinov.studentdumbways.my.id
+    labels:
+      server: "app-server-2"
+
+- job_name: database-server
+  scrape_interval: 10s
+  scheme: https
+  static_configs:
+  - targets:
+    - database.exporter.millinov.studentdumbways.my.id
+    labels:
+      server: "database-server"
+
+- job_name: jenkins-server
+  scrape_interval: 10s
+  scheme: https
+  static_configs:
+  - targets:
+    - jenkins.exporter.millinov.studentdumbways.my.id
+    labels:
+      server: "jenkins-server"
+
+- job_name: monitor-server
+  scrape_interval: 10s
+  scheme: https
+  static_configs:
+  - targets:
+    - monitor.exporter.millinov.studentdumbways.my.id
+    labels:
+      server: "monitoring-server"
+
+- job_name: registry-server
+  scrape_interval: 10s
+  scheme: https
+  static_configs:
+  - targets:
+    - registry.exporter.millinov.studentdumbways.my.id
+    labels:
+      server: "build-server"
+
+- job_name: web-server
+  scrape_interval: 10s
+  scheme: https
+  static_configs:
+  - targets:
+    - gateway.exporter.millinov.studentdumbways.my.id
+    labels:
+      server: "web-server"
+
+- job_name: sonarqube-server
+  scrape_interval: 10s
+  scheme: https
+  static_configs:
+  - targets:
+    - sonarqube.exporter.millinov.studentdumbways.my.id
+    labels:
+      server: "sonarqube-server"
+
+- job_name: kubernetes
+  scrape_interval: 10s
+  static_configs:
+  - targets:
+      - "10.184.0.12:9100"
+    labels:
+      server: "kube-master"
+
+  - targets:
+      - "10.184.0.11:9100"
+    labels:
+      server: "Kube-worker-1"
+
+  - targets:
+      - "10.184.0.10:9100"
+    labels:
+      server: "Kube-worker-2"
+
+- job_name: cadvisor
+  scrape_interval: 10s
+  static_configs:
+  - targets:
+      - "10.184.0.3:8080"
+    labels:
+      server: "app-server-1"
+
+  - targets:
+      - "10.184.0.9:8080"
+    labels:
+      server: "app-server-2"
+
+  - targets:
+      - "10.184.0.2:8080"
+    labels:
+      server: "build-server"
+
+  - targets:
+      - "10.184.0.7:8080"
+    labels:
+      server: "jenkins-server"
+
+  - targets:
+      - "10.184.0.5:8080"
+    labels:
+      server: "sonarqube-server"
+
+  - targets:
+      - "10.184.0.8:8080"
+    labels:
+      server: "database-server"
+
+  - targets:
+      - "10.184.0.4:8080"
+    labels:
+      server: "monitoring-server"
+
+  - targets:
+      - "10.184.0.6:8080"
+    labels:
+      server: "web-server"
+
+  - targets:
+      - "10.184.0.12:8080"
+    labels:
+      server: "kube-master"
+
+  - targets:
+      - "10.184.0.11:8080"
+    labels:
+      server: "Kube-worker-1"
+
+  - targets:
+      - "10.184.0.10:8080"
+    labels:
+      server: "Kube-worker-2"

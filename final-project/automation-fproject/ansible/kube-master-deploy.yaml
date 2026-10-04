@@ -1,0 +1,59 @@
+- name: Deploy K3S - Lightweight Kubernetes on Kube Master Node
+  hosts: kube_master
+  become: true 
+
+  tasks:
+
+    - name: Check If K3S Is Installed
+      command: systemctl is-active k3s
+      register: k3s_status
+      changed_when: false
+      failed_when: false
+
+    - name: Debug K3S Output
+      debug:
+        var: k3s_status 
+        
+    - name: If error, install K3S
+      when: k3s_status.rc != 0
+      block:
+        - name: Set hostname to master to avoid confusion in the future
+          shell: |
+            hostnamectl set-hostname master 
+            echo master > /etc/hostname
+
+        - name: Install K3S
+          shell: curl -sfL https://get.k3s.io | sh 
+
+    - name: Check K3S status
+      command:
+        cmd: k3s kubectl get nodes
+      register: K3S_master
+      changed_when: false
+      failed_when: false
+
+    - name: Debug K3S_master Output
+      debug:
+        var: K3S_master 
+
+    - name: Setup Kube Master Config
+      copy:
+        dest: /etc/rancher/k3s/config.yaml
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          cluster-init: true
+          disable: servicelb
+          disable: traefik
+          default-local-storage-path: /mnt/disk1
+
+    - name: Search master token
+      when: K3S_master.rc == 0
+      command: 
+        cmd:  cat /var/lib/rancher/k3s/server/token
+      register: tokenK3S
+      
+    - name: Debug tokenK3S Output
+      debug:
+        var: tokenK3S 
